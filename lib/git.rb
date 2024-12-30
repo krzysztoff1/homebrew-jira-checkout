@@ -2,8 +2,8 @@
 
 # Class for interacting with git
 class Git
-  def self.checkout_to_branch(jira_key, jira_summary)
-    branch_name = branch_name(jira_key, jira_summary)
+  def checkout_to_branch(jira_issue)
+    branch_name = branch_name(jira_issue[:key], jira_issue[:summary])
 
     run_command("git checkout -b #{branch_name}")
   end
@@ -15,6 +15,6 @@ class Git
   end
 
   def branch_name(jira_key, jira_summary)
-    "#{jira_key.downcase.gsub(/\s+/, '/')}-#{jira_summary.downcase.gsub(/\s+/, '-')}"
+    "#{jira_key.downcase.gsub(/\s+/, '/')}/#{jira_summary.downcase.gsub(/[\[\]]/, '').gsub(/\s+/, '-')}"
   end
 end

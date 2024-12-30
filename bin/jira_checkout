@@ -24,6 +24,7 @@ end
 
 selected_issue = prompt.select('Choose issue:', choices, filter: true, per_page: 10)
 
-Git.checkout_to_branch(selected_issue['key'], selected_issue['fields']['summary'])
+git = Git.new
+git.checkout_to_branch(selected_issue)
 
 puts 'Branch created and checked out'
