@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+require 'English'
+
+# Class for interacting with git
+class Git
+  def branches
+    output = run_command('git branch --format="%(refname:short)"')
+    if $CHILD_STATUS.success?
+      output.split("\n").map(&:strip)
+    else
+      puts 'Error: Not in a git repository'
+      exit 1
+    end
+  end
+
+  def run_command(command)
+    command
+  end
+end
+
+git = Git.new
+git.branches.each do |branch|
+  puts branch
+end
