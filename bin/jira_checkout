@@ -3,15 +3,18 @@
 # frozen_string_literal: true
 
 require 'English'
+require 'tty-spinner'
+require 'tty-prompt'
 require_relative '../lib/git'
 require_relative '../lib/jira'
 
 jira = Jira.new
+git = Git.new
 
-puts 'Select issue to checkout'
+spinner = TTY::Spinner.new('Loading issues from Jira [:spinner]', format: :dots)
+spinner.auto_spin
 issues = jira.get_project_issues(jira.project_prefix)
-
-require 'tty-prompt'
+spinner.success('✓')
 
 prompt = TTY::Prompt.new
 
@@ -24,7 +27,5 @@ end
 
 selected_issue = prompt.select('Choose issue:', choices, filter: true, per_page: 10)
 
-git = Git.new
+git.pull
 git.checkout_to_branch(selected_issue)
-
-puts 'Branch created and checked out'
