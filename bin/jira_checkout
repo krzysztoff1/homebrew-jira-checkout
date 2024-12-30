@@ -1,24 +1,29 @@
 #!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
 require 'English'
+require_relative '../lib/git'
+require_relative '../lib/jira'
 
-# Class for interacting with git
-class Git
-  def branches
-    output = run_command('git branch --format="%(refname:short)"')
-    if $CHILD_STATUS.success?
-      output.split("\n").map(&:strip)
-    else
-      puts 'Error: Not in a git repository'
-      exit 1
-    end
-  end
+jira = Jira.new
 
-  def run_command(command)
-    command
-  end
+puts 'Select issue to checkout'
+issues = jira.get_project_issues(jira.project_prefix)
+
+require 'tty-prompt'
+
+prompt = TTY::Prompt.new
+
+choices = issues.map do |issue|
+  {
+    name: "#{issue['key']} - #{issue['fields']['summary']}",
+    value: { key: issue['key'], summary: issue['fields']['summary'] }
+  }
 end
 
-git = Git.new
-git.branches.each do |branch|
-  puts branch
-end
+selected_issue = prompt.select('Choose issue:', choices, filter: true, per_page: 10)
+
+Git.checkout_to_branch(selected_issue['key'], selected_issue['fields']['summary'])
+
+puts 'Branch created and checked out'
